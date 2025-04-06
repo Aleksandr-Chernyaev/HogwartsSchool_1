@@ -41,9 +41,4 @@ public class StudentController {
     public void deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
     }
-
-    @GetMapping("/filter/age/{age}")
-    public List<Student> filterByAge(@PathVariable int age) {
-        return studentService.filterByAge(age);
-    }
 }
