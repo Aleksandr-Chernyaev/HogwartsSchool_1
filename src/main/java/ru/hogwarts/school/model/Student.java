@@ -29,7 +29,6 @@ public class Student {
         this.faculty = faculty;
     }
 
-    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }
