@@ -2,6 +2,7 @@ package ru.hogwarts.school.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.exception.FacultyNotFoundException; // Импортируем исключение
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 
@@ -22,7 +23,8 @@ public class FacultyService {
     }
 
     public Faculty getFaculty(Long id) {
-        return facultyRepository.findById(id).orElse(null);
+        return facultyRepository.findById(id)
+                .orElseThrow(() -> new FacultyNotFoundException("Faculty with id " + id + " not found"));
     }
 
     public List<Faculty> getAllFaculties() {
@@ -31,16 +33,15 @@ public class FacultyService {
 
     public Faculty updateFaculty(Long id, String name, String color) {
         Faculty faculty = getFaculty(id);
-        if (faculty != null) {
-            faculty.setName(name);
-            faculty.setColor(color);
-            return facultyRepository.save(faculty);
-        }
-        return null;
+        faculty.setName(name);
+        faculty.setColor(color);
+        return facultyRepository.save(faculty);
     }
 
     public void deleteFaculty(Long id) {
-        facultyRepository.deleteById(id);
+        Faculty faculty = facultyRepository.findById(id)
+                .orElseThrow(() -> new FacultyNotFoundException("Faculty not found with id: " + id));
+        facultyRepository.delete(faculty);
     }
 
     public List<Faculty> filterByColor(String color) {
