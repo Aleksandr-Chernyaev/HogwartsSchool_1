@@ -21,7 +21,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class FacultyControllerTest {
+public class FacultyControllerTestRestTemplate {
 
     @Autowired
     private TestRestTemplate restTemplate;

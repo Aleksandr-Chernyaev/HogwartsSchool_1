@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class StudentControllerTest {
+public class StudentControllerTestRestTemplate {
 
     @Autowired
     private TestRestTemplate restTemplate;
