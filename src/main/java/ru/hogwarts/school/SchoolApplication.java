@@ -1,4 +1,4 @@
-package ru.hogwarts.school; // Убедитесь, что пакет соответствует вашей структуре
+package ru.hogwarts.school;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
