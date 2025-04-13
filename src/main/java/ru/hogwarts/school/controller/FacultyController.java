@@ -1,7 +1,10 @@
 package ru.hogwarts.school.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.FacultyService;
 
@@ -18,13 +21,20 @@ public class FacultyController {
     }
 
     @PostMapping
-    public Faculty createFaculty(@RequestParam String name, @RequestParam String color) {
-        return facultyService.createFaculty(name, color);
+    public ResponseEntity<Faculty> createFaculty(@RequestParam String name, @RequestParam String color) {
+        Faculty createdFaculty = facultyService.createFaculty(name, color);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdFaculty);
     }
 
     @GetMapping
-    public List<Faculty> getAllFaculties() {
-        return facultyService.getAllFaculties();
+    public ResponseEntity<List<Faculty>> getAllFaculties() {
+        List<Faculty> faculties = facultyService.getAllFaculties();
+
+        if (faculties == null || faculties.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(faculties);
     }
 
     @GetMapping("/{id}")
@@ -38,8 +48,16 @@ public class FacultyController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteFaculty(@PathVariable Long id) {
-        facultyService.deleteFaculty(id);
+    public ResponseEntity<Void> deleteFaculty(@PathVariable Long id) {
+        try {
+            facultyService.deleteFaculty(id);
+            return ResponseEntity.noContent().build();
+        } catch (FacultyNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/filter/color/{color}")
