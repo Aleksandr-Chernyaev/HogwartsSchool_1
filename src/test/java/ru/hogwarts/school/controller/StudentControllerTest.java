@@ -2,96 +2,111 @@ package ru.hogwarts.school.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.service.StudentService;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.Arrays;
+import java.util.List;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 public class StudentControllerTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @InjectMocks
+    private StudentController studentController;
 
-    private Long studentId;
+    @Mock
+    private StudentService studentService;
 
-    private static final String BASE_URL = "/student";
+    private MockMvc mockMvc;
 
     @BeforeEach
-    public void setUp() {
-        ResponseEntity<Student> response = restTemplate.postForEntity(
-                BASE_URL + "?name=Женька&age=20", null, Student.class);
-        assertEquals(201, response.getStatusCodeValue());
-        studentId = response.getBody().getId();
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(studentController).build();
     }
 
     @Test
-    public void testCreateStudent() {
-        ResponseEntity<Student> response = restTemplate.postForEntity(
-                BASE_URL + "?name=Гарри&age=22", null, Student.class);
+    public void testCreateStudent() throws Exception {
+        Student student = new Student("Гарри", 22);
+        when(studentService.createStudent(any(String.class), anyInt())).thenReturn(student);
 
-        assertEquals(201, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertEquals("Гарри", response.getBody().getName());
-        assertEquals(22, response.getBody().getAge());
+        mockMvc.perform(post("/student")
+                        .param("name", "Гарри")
+                        .param("age", "22")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Гарри"))
+                .andExpect(jsonPath("$.age").value(22));
+
+        verify(studentService, times(1)).createStudent("Гарри", 22);
     }
 
     @Test
-    public void testGetAllStudents() {
-        ResponseEntity<Student[]> response = restTemplate.getForEntity(BASE_URL, Student[].class);
+    public void testGetAllStudents() throws Exception {
+        List<Student> students = Arrays.asList(
+                new Student("Гарри", 22),
+                new Student("Рон", 21)
+        );
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertThat(response.getBody()).hasSizeGreaterThan(0);
+        when(studentService.getAllStudents()).thenReturn(students);
+
+        mockMvc.perform(get("/student"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].name").value("Гарри"))
+                .andExpect(jsonPath("$[1].name").value("Рон"));
+
+        verify(studentService, times(1)).getAllStudents();
     }
 
     @Test
-    public void testGetStudentById() {
-        ResponseEntity<Student> response = restTemplate.getForEntity(BASE_URL + "/" + studentId, Student.class);
+    public void testGetStudent() throws Exception {
+        Student student = new Student("Гарри", 22);
+        when(studentService.getStudent(anyLong())).thenReturn(student);
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertEquals(studentId, response.getBody().getId());
+        mockMvc.perform(get("/student/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Гарри"))
+                .andExpect(jsonPath("$.age").value(22));
+
+        verify(studentService, times(1)).getStudent(1L);
     }
 
     @Test
-    public void testUpdateStudent() {
-        String newName = "Гриня";
-        int newAge = 21;
+    public void testUpdateStudent() throws Exception {
+        Student updatedStudent = new Student("Гарри Поттер", 23);
+        when(studentService.updateStudent(anyLong(), any(String.class), anyInt())).thenReturn(updatedStudent);
 
-        ResponseEntity<Student> response = restTemplate.exchange(
-                BASE_URL + "/" + studentId + "?name=" + newName + "&age=" + newAge,
-                HttpMethod.PUT,
-                null,
-                Student.class);
+        mockMvc.perform(put("/student/{id}", 1L)
+                        .param("name", "Гарри Поттер")
+                        .param("age", "23")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Гарри Поттер"))
+                .andExpect(jsonPath("$.age").value(23));
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertEquals(newName, response.getBody().getName());
-        assertEquals(newAge, response.getBody().getAge());
+        verify(studentService, times(1)).updateStudent(1L, "Гарри Поттер", 23);
     }
 
     @Test
-    public void testDeleteStudent() {
-        restTemplate.delete(BASE_URL + "/" + studentId);
+    public void testDeleteStudent() throws Exception {
+        doNothing().when(studentService).deleteStudent(anyLong());
 
-        ResponseEntity<Student> response = restTemplate.getForEntity(BASE_URL + "/" + studentId, Student.class);
+        mockMvc.perform(delete("/student/{id}", 1L))
+                .andExpect(status().isOk());
 
-        assertEquals(200, response.getStatusCodeValue());
-    }
-
-    @Test
-    public void testGetNonExistentStudent() {
-        ResponseEntity<Student> response = restTemplate.getForEntity(BASE_URL + "/9999", Student.class);
-
-        assertEquals(200, response.getStatusCodeValue());
+        verify(studentService, times(1)).deleteStudent(1L);
     }
 }
