@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class FacultyControllerTestWebMvcTest {
+public class FacultyControllerTest {
 
     @InjectMocks
     private FacultyController facultyController;
