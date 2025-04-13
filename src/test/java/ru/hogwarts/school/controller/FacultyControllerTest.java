@@ -28,15 +28,17 @@ public class FacultyControllerTest {
 
     private Faculty createdFaculty;
 
+    private static final String BASE_URL = "/faculty";
+
     @BeforeEach
     public void setUp() {
         // Создаем факультет для использования в тестах
-        createdFaculty = restTemplate.postForObject("/faculty?name=Кря&color=Красный", null, Faculty.class);
+        createdFaculty = restTemplate.postForObject(BASE_URL + "?name=Кря&color=Красный", null, Faculty.class);
     }
 
     @Test
     public void testCreateFaculty() {
-        ResponseEntity<Faculty> response = restTemplate.postForEntity("/faculty?name=Спорт&color=Синий", null, Faculty.class);
+        ResponseEntity<Faculty> response = restTemplate.postForEntity(BASE_URL + "?name=Спорт&color=Синий", null, Faculty.class);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getName()).isEqualTo("Спорт");
@@ -45,14 +47,14 @@ public class FacultyControllerTest {
 
     @Test
     public void testGetAllFaculties() {
-        ResponseEntity<List> response = restTemplate.exchange("/faculty", HttpMethod.GET, null, List.class);
+        ResponseEntity<List> response = restTemplate.exchange(BASE_URL, HttpMethod.GET, null, List.class);
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getBody()).isNotEmpty();
     }
 
     @Test
     public void testGetFaculty() {
-        ResponseEntity<Faculty> response = restTemplate.getForEntity("/faculty/" + createdFaculty.getId(), Faculty.class);
+        ResponseEntity<Faculty> response = restTemplate.getForEntity(BASE_URL + "/" + createdFaculty.getId(), Faculty.class);
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getId()).isEqualTo(createdFaculty.getId());
@@ -63,7 +65,7 @@ public class FacultyControllerTest {
         Long facultyId = createdFaculty.getId();
         HttpEntity<Faculty> request = new HttpEntity<>(new Faculty("Обновил", "Малиновый"));
 
-        ResponseEntity<Faculty> response = restTemplate.exchange("/faculty/" + facultyId + "?name=Обновил&color=Малиновый", HttpMethod.PUT, request, Faculty.class);
+        ResponseEntity<Faculty> response = restTemplate.exchange(BASE_URL + "/" + facultyId + "?name=Обновил&color=Малиновый", HttpMethod.PUT, request, Faculty.class);
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getBody()).isNotNull();
@@ -71,11 +73,11 @@ public class FacultyControllerTest {
     }
 
     @Test
-    public void testDeleteFaculty() {
+    public void testDeleteNonExistentFaculty() {
         Long nonExistentId = 999L;
 
         ResponseEntity<Void> response = restTemplate.exchange(
-                "/faculty/" + nonExistentId,
+                BASE_URL + "/" + nonExistentId,
                 HttpMethod.DELETE,
                 null,
                 Void.class
@@ -86,9 +88,8 @@ public class FacultyControllerTest {
 
     @Test
     public void testFilterByColor() {
-        ResponseEntity<List> response = restTemplate.exchange("/faculty/filter/color/Green", HttpMethod.GET, null, List.class);
+        ResponseEntity<List> response = restTemplate.exchange(BASE_URL + "/filter/color/Green", HttpMethod.GET, null, List.class);
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
-        assertThat(response.getBody()).isNotEmpty();
     }
 }

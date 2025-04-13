@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import ru.hogwarts.school.model.Student;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -22,10 +23,12 @@ public class StudentControllerTest {
 
     private Long studentId;
 
+    private static final String BASE_URL = "/student";
+
     @BeforeEach
     public void setUp() {
         ResponseEntity<Student> response = restTemplate.postForEntity(
-                "/student?name=Женька&age=20", null, Student.class);
+                BASE_URL + "?name=Женька&age=20", null, Student.class);
         assertEquals(201, response.getStatusCodeValue());
         studentId = response.getBody().getId();
     }
@@ -33,7 +36,7 @@ public class StudentControllerTest {
     @Test
     public void testCreateStudent() {
         ResponseEntity<Student> response = restTemplate.postForEntity(
-                "/student?name=Гарри&age=22", null, Student.class);
+                BASE_URL + "?name=Гарри&age=22", null, Student.class);
 
         assertEquals(201, response.getStatusCodeValue());
         assertNotNull(response.getBody());
@@ -43,15 +46,16 @@ public class StudentControllerTest {
 
     @Test
     public void testGetAllStudents() {
-        ResponseEntity<Student[]> response = restTemplate.getForEntity("/student", Student[].class);
+        ResponseEntity<Student[]> response = restTemplate.getForEntity(BASE_URL, Student[].class);
 
         assertEquals(200, response.getStatusCodeValue());
         assertNotNull(response.getBody());
+        assertThat(response.getBody()).hasSizeGreaterThan(0);
     }
 
     @Test
     public void testGetStudentById() {
-        ResponseEntity<Student> response = restTemplate.getForEntity("/student/" + studentId, Student.class);
+        ResponseEntity<Student> response = restTemplate.getForEntity(BASE_URL + "/" + studentId, Student.class);
 
         assertEquals(200, response.getStatusCodeValue());
         assertNotNull(response.getBody());
@@ -64,7 +68,7 @@ public class StudentControllerTest {
         int newAge = 21;
 
         ResponseEntity<Student> response = restTemplate.exchange(
-                "/student/" + studentId + "?name=" + newName + "&age=" + newAge,
+                BASE_URL + "/" + studentId + "?name=" + newName + "&age=" + newAge,
                 HttpMethod.PUT,
                 null,
                 Student.class);
@@ -77,9 +81,16 @@ public class StudentControllerTest {
 
     @Test
     public void testDeleteStudent() {
-        restTemplate.delete("/student/" + studentId);
+        restTemplate.delete(BASE_URL + "/" + studentId);
 
-        ResponseEntity<Student> response = restTemplate.getForEntity("/student/" + studentId, Student.class);
+        ResponseEntity<Student> response = restTemplate.getForEntity(BASE_URL + "/" + studentId, Student.class);
+
+        assertEquals(200, response.getStatusCodeValue());
+    }
+
+    @Test
+    public void testGetNonExistentStudent() {
+        ResponseEntity<Student> response = restTemplate.getForEntity(BASE_URL + "/9999", Student.class);
 
         assertEquals(200, response.getStatusCodeValue());
     }
