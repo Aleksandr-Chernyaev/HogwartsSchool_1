@@ -16,7 +16,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -60,7 +61,7 @@ public class FacultyControllerTest {
     @Test
     public void testUpdateFaculty() {
         Long facultyId = createdFaculty.getId();
-        HttpEntity<Faculty> request = new HttpEntity<>(new Faculty( "Обновил", "Малиновый"));
+        HttpEntity<Faculty> request = new HttpEntity<>(new Faculty("Обновил", "Малиновый"));
 
         ResponseEntity<Faculty> response = restTemplate.exchange("/faculty/" + facultyId + "?name=Обновил&color=Малиновый", HttpMethod.PUT, request, Faculty.class);
 
