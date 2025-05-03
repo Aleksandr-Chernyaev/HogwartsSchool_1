@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.List;
@@ -25,11 +26,6 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStudent);
     }
 
-    @GetMapping
-    public List<Student> getAllStudents() {
-        return studentService.getAllStudents();
-    }
-
     @GetMapping("/{id}")
     public Student getStudent(@PathVariable Long id) {
         return studentService.getStudent(id);
@@ -43,5 +39,23 @@ public class StudentController {
     @DeleteMapping("/{id}")
     public void deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
+    }
+
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @GetMapping("/students/count")
+    public long getCount() {
+        return studentRepository.countAllStudents();
+    }
+
+    @GetMapping("/students/average-age")
+    public double getAverageAge() {
+        return studentRepository.findAverageAge();
+    }
+
+    @GetMapping("/students/latest")
+    public List<Student> getLatestStudents() {
+        return studentRepository.findTop5ByOrderByIdDesc();
     }
 }
