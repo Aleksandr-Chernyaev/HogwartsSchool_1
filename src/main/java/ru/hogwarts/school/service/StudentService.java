@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 
+import java.util.List;
+
 @Service
 public class StudentService {
     private final StudentRepository studentRepository;
@@ -37,5 +39,18 @@ public class StudentService {
         if (studentRepository.existsById(id)) {
             studentRepository.deleteById(id);
         }
+    }
+
+    public long getCount() {
+        return studentRepository.count();
+    }
+
+    public double getAverageAge() {
+        Double avgAge = studentRepository.findAverageAge();
+        return avgAge != null ? avgAge : 0.0;
+    }
+
+    public List<Student> getLatestStudents() {
+        return studentRepository.findTop5ByOrderByIdDesc();
     }
 }

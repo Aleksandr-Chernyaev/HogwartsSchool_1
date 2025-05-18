@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Student;
-import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/student")
 public class StudentController {
+
     private final StudentService studentService;
 
     @Autowired
@@ -41,21 +41,18 @@ public class StudentController {
         studentService.deleteStudent(id);
     }
 
-    @Autowired
-    private StudentRepository studentRepository;
-
-    @GetMapping("/students/count")
+    @GetMapping("/count")
     public long getCount() {
-        return studentRepository.countAllStudents();
+        return studentService.getCount();
     }
 
-    @GetMapping("/students/average-age")
+    @GetMapping("/average-age")
     public double getAverageAge() {
-        return studentRepository.findAverageAge();
+        return studentService.getAverageAge();
     }
 
-    @GetMapping("/students/latest")
+    @GetMapping("/latest")
     public List<Student> getLatestStudents() {
-        return studentRepository.findTop5ByOrderByIdDesc();
+        return studentService.getLatestStudents();
     }
 }

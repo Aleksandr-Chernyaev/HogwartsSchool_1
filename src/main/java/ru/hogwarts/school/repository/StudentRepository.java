@@ -14,8 +14,8 @@ public interface StudentRepository extends CrudRepository<Student, Long> {
     long countAllStudents();
 
     @Query("SELECT AVG(s.age) FROM Student s")
-    double findAverageAge();
+    Double findAverageAge();
 
-    @Query(value = "SELECT s FROM Student s ORDER BY s.id DESC")
+    @Query(value = "SELECT * FROM student ORDER BY id DESC LIMIT 5", nativeQuery = true)
     List<Student> findTop5ByOrderByIdDesc();
 }
