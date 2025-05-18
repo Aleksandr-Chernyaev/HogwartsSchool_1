@@ -12,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/student")
 public class StudentController {
+
     private final StudentService studentService;
 
     @Autowired
@@ -23,11 +24,6 @@ public class StudentController {
     public ResponseEntity<Student> createStudent(@RequestParam String name, @RequestParam int age) {
         Student createdStudent = studentService.createStudent(name, age);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStudent);
-    }
-
-    @GetMapping
-    public List<Student> getAllStudents() {
-        return studentService.getAllStudents();
     }
 
     @GetMapping("/{id}")
@@ -43,5 +39,20 @@ public class StudentController {
     @DeleteMapping("/{id}")
     public void deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
+    }
+
+    @GetMapping("/count")
+    public long getCount() {
+        return studentService.getCount();
+    }
+
+    @GetMapping("/average-age")
+    public double getAverageAge() {
+        return studentService.getAverageAge();
+    }
+
+    @GetMapping("/latest")
+    public List<Student> getLatestStudents() {
+        return studentService.getLatestStudents();
     }
 }

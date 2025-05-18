@@ -25,10 +25,6 @@ public class StudentService {
         return studentRepository.findById(id).orElse(null);
     }
 
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
-    }
-
     public Student updateStudent(Long id, String name, int age) {
         Student student = getStudent(id);
         if (student != null) {
@@ -45,7 +41,16 @@ public class StudentService {
         }
     }
 
-    public List<Student> filterByAgeRange(int minAge, int maxAge) {
-        return studentRepository.findByAgeBetween(minAge, maxAge);
+    public long getCount() {
+        return studentRepository.count();
+    }
+
+    public double getAverageAge() {
+        Double avgAge = studentRepository.findAverageAge();
+        return avgAge != null ? avgAge : 0.0;
+    }
+
+    public List<Student> getLatestStudents() {
+        return studentRepository.findTop5ByOrderByIdDesc();
     }
 }
