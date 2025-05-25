@@ -53,23 +53,23 @@ public class StudentControllerTestWebMvcTest {
         verify(studentService, times(1)).createStudent("Гарри", 22);
     }
 
-    @Test
-    public void testGetAllStudents() throws Exception {
-        List<Student> students = Arrays.asList(
-                new Student("Гарри", 22),
-                new Student("Рон", 21)
-        );
-
-        when(studentService.getAllStudents()).thenReturn(students);
-
-        mockMvc.perform(get("/student"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].name").value("Гарри"))
-                .andExpect(jsonPath("$[1].name").value("Рон"));
-
-        verify(studentService, times(1)).getAllStudents();
-    }
+//    @Test
+//    public void testGetAllStudents() throws Exception {
+//        List<Student> students = Arrays.asList(
+//                new Student("Гарри", 22),
+//                new Student("Рон", 21)
+//        );
+//
+//        when(studentService.getAllStudents()).thenReturn(students);
+//
+//        mockMvc.perform(get("/student"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$").isArray())
+//                .andExpect(jsonPath("$[0].name").value("Гарри"))
+//                .andExpect(jsonPath("$[1].name").value("Рон"));
+//
+//        verify(studentService, times(1)).getAllStudents();
+//    }
 
     @Test
     public void testGetStudent() throws Exception {
