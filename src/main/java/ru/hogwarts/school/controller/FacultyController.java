@@ -8,6 +8,7 @@ import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.FacultyService;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -63,5 +64,13 @@ public class FacultyController {
     @GetMapping("/filter/color/{color}")
     public List<Faculty> filterByColor(@PathVariable String color) {
         return facultyService.filterByColor(color);
+    }
+
+    @GetMapping("/faculties/longest-name")
+    public String getLongestFacultyName() {
+        return facultyService.getAllFaculties().stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length))
+                .orElse("");
     }
 }

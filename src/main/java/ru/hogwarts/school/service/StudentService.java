@@ -29,6 +29,7 @@ public class StudentService {
                 .orElseThrow(() -> new RuntimeException("Студент с id=" + id + " не найден"));
     }
 
+    // Оставьте только один getAllStudents()
     public List<Student> getAllStudents() {
         logger.info("Вызван метод для получения всех студентов");
         return (List<Student>) studentRepository.findAll();

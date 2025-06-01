@@ -17,7 +17,7 @@ public class AvatarService {
     private AvatarRepository avatarRepository;
 
     public Page<Avatar> getAvatars(Pageable pageable) {
-        logger.info("Вызван метод получения аватаров с пагинацией");
+        logger.info("Вызван метод получения аватарок с пагинацией");
         return avatarRepository.findAll(pageable);
     }
 }

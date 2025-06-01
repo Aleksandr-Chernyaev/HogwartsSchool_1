@@ -51,7 +51,7 @@ public class FacultyService {
         }
         facultyRepository.deleteById(id);
     }
-    
+
     public List<Faculty> filterByColor(String color) {
         logger.info("Вызван метод для фильтрации факультетов по цвету: {}", color);
         return facultyRepository.findByColorIgnoreCase(color);
